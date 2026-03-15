@@ -953,15 +953,3 @@ Neither alone is sufficient. Defense in depth means every layer is protected.
 | **Low** | None — raw input throughout | Fully exploitable |
 | **Medium** | Partial — blacklists, basic filtering | Most bypassed with simple techniques |
 | **High** | Proper — whitelists, prepared statements, tokens | Not exploitable with standard techniques |
-
-**Core lessons from this lab:**
-
-- Blacklists fail — there are always bypass vectors. Whitelists and structural defenses are reliable.
-- Client-supplied data is untrusted — MIME types, Referer headers, hidden fields, and boolean parameters are all attacker-controlled.
-- Security must be designed in from the start — not patched afterward.
-- HTTPS + application security + rate limiting + tokens together create meaningfully stronger protection than any single control alone.
-
----
-
-*Report by [@inciasaleem-dev](https://github.com/inciasaleem-dev) | Application Security Testing Assignment*  
-*All testing performed on a local, isolated Docker container. No external systems were targeted.*
